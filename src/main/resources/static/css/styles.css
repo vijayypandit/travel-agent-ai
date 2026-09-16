@@ -1,0 +1,363 @@
+/* ==========================================================================
+   Classic Chat UI Styles with Dynamic Theming & Dark Mode
+   ========================================================================== */
+
+/* ── Theme Variables ── */
+:root {
+    --theme-primary: #2563eb;
+    --theme-hover: #1d4ed8;
+    --theme-light: #eff6ff;
+    --theme-border: #bfdbfe;
+    --theme-ring: rgba(37, 99, 235, 0.25);
+    --theme-card-hover: rgba(37, 99, 235, 0.05);
+}
+
+[data-color="rose"] {
+    --theme-primary: #e11d48;
+    --theme-hover: #be123c;
+    --theme-light: #fff1f2;
+    --theme-border: #fecdd3;
+    --theme-ring: rgba(225, 29, 72, 0.25);
+    --theme-card-hover: rgba(225, 29, 72, 0.05);
+}
+
+[data-color="emerald"] {
+    --theme-primary: #059669;
+    --theme-hover: #047857;
+    --theme-light: #ecfdf5;
+    --theme-border: #a7f3d0;
+    --theme-ring: rgba(5, 150, 105, 0.25);
+    --theme-card-hover: rgba(5, 150, 105, 0.05);
+}
+
+[data-color="amber"] {
+    --theme-primary: #d97706;
+    --theme-hover: #b45309;
+    --theme-light: #fffbeb;
+    --theme-border: #fde68a;
+    --theme-ring: rgba(217, 119, 6, 0.25);
+    --theme-card-hover: rgba(217, 119, 6, 0.05);
+}
+
+[data-color="violet"] {
+    --theme-primary: #7c3aed;
+    --theme-hover: #6d28d9;
+    --theme-light: #f5f3ff;
+    --theme-border: #ddd6fe;
+    --theme-ring: rgba(124, 58, 237, 0.25);
+    --theme-card-hover: rgba(124, 58, 237, 0.05);
+}
+
+[data-color="cyan"] {
+    --theme-primary: #0891b2;
+    --theme-hover: #0e7490;
+    --theme-light: #ecfeff;
+    --theme-border: #a5f3fc;
+    --theme-ring: rgba(8, 145, 178, 0.25);
+    --theme-card-hover: rgba(8, 145, 178, 0.05);
+}
+
+[data-color="orange"] {
+    --theme-primary: #ea580c;
+    --theme-hover: #c2410c;
+    --theme-light: #fff7ed;
+    --theme-border: #fed7aa;
+    --theme-ring: rgba(234, 88, 12, 0.25);
+    --theme-card-hover: rgba(234, 88, 12, 0.05);
+}
+
+[data-color="fuchsia"] {
+    --theme-primary: #c026d3;
+    --theme-hover: #a21caf;
+    --theme-light: #fdf4ff;
+    --theme-border: #f5d0fe;
+    --theme-ring: rgba(192, 38, 211, 0.25);
+    --theme-card-hover: rgba(192, 38, 211, 0.05);
+}
+
+/* Dark Mode Overrides for Theme Lights */
+html.dark [data-color="blue"],
+html.dark:not([data-color]) {
+    --theme-light: #1e293b;
+    --theme-border: #1e3a8a;
+    --theme-card-hover: rgba(59, 130, 246, 0.1);
+}
+
+html.dark[data-color="rose"] {
+    --theme-light: #271216;
+    --theme-border: #881337;
+    --theme-card-hover: rgba(244, 63, 94, 0.1);
+}
+
+html.dark[data-color="emerald"] {
+    --theme-light: #06241a;
+    --theme-border: #064e3b;
+    --theme-card-hover: rgba(16, 185, 129, 0.1);
+}
+
+html.dark[data-color="amber"] {
+    --theme-light: #281a07;
+    --theme-border: #78350f;
+    --theme-card-hover: rgba(245, 158, 11, 0.1);
+}
+
+html.dark[data-color="violet"] {
+    --theme-light: #1d1235;
+    --theme-border: #4c1d95;
+    --theme-card-hover: rgba(139, 92, 246, 0.1);
+}
+
+html.dark[data-color="cyan"] {
+    --theme-light: #07232b;
+    --theme-border: #164e63;
+    --theme-card-hover: rgba(6, 182, 212, 0.1);
+}
+
+html.dark[data-color="orange"] {
+    --theme-light: #281408;
+    --theme-border: #7c2d12;
+    --theme-card-hover: rgba(249, 115, 22, 0.1);
+}
+
+html.dark[data-color="fuchsia"] {
+    --theme-light: #280d2d;
+    --theme-border: #701a75;
+    --theme-card-hover: rgba(217, 70, 239, 0.1);
+}
+
+/* ── Utility Classes for Dynamic Colors ── */
+.theme-bg {
+    background-color: var(--theme-primary) !important;
+}
+.theme-bg-hover:hover {
+    background-color: var(--theme-hover) !important;
+}
+.theme-text {
+    color: var(--theme-primary) !important;
+}
+.theme-border {
+    border-color: var(--theme-border) !important;
+}
+.theme-light-bg {
+    background-color: var(--theme-light) !important;
+}
+.theme-ring:focus-within {
+    border-color: var(--theme-primary) !important;
+    box-shadow: 0 0 0 3px var(--theme-ring) !important;
+}
+
+/* Custom Smooth Scrollbar */
+#chatMessages::-webkit-scrollbar {
+    width: 6px;
+}
+#chatMessages::-webkit-scrollbar-track {
+    background: transparent;
+}
+#chatMessages::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 9999px;
+}
+#chatMessages::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+html.dark #chatMessages::-webkit-scrollbar-thumb {
+    background: #475569;
+}
+html.dark #chatMessages::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+
+/* Message Entrance Animations */
+.message-enter {
+    animation: messageSlideIn 0.25s ease-out forwards;
+}
+
+@keyframes messageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Typing Indicator Animation */
+.typing-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: #64748b;
+    display: inline-block;
+    animation: typingBounce 1.4s infinite ease-in-out both;
+}
+
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+.typing-dot:nth-child(3) { animation-delay: 0s; }
+
+@keyframes typingBounce {
+    0%, 80%, 100% {
+        transform: scale(0.6);
+        opacity: 0.4;
+    }
+    40% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+}
+
+/* User Message Bubble */
+.user-bubble {
+    background-color: var(--theme-primary);
+    color: #ffffff;
+}
+
+/* AI Message Markdown & Prose Styling */
+.ai-content {
+    line-height: 1.625;
+    word-break: break-word;
+}
+
+.ai-content p {
+    margin-bottom: 0.65rem;
+}
+
+.ai-content p:last-child {
+    margin-bottom: 0;
+}
+
+.ai-content strong {
+    font-weight: 600;
+}
+html:not(.dark) .ai-content strong {
+    color: #0f172a;
+}
+html.dark .ai-content strong {
+    color: #f8fafc;
+}
+
+.ai-content em {
+    font-style: italic;
+}
+
+.ai-content code:not(pre code) {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.85em;
+    padding: 0.15rem 0.4rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+}
+html:not(.dark) .ai-content code:not(pre code) {
+    background-color: #f1f5f9;
+    color: var(--theme-primary);
+    border: 1px solid #e2e8f0;
+}
+html.dark .ai-content code:not(pre code) {
+    background-color: #1e293b;
+    color: #93c5fd;
+    border: 1px solid #334155;
+}
+
+.ai-content ul {
+    list-style-type: disc;
+    padding-left: 1.4rem;
+    margin: 0.5rem 0;
+}
+
+.ai-content ol {
+    list-style-type: decimal;
+    padding-left: 1.4rem;
+    margin: 0.5rem 0;
+}
+
+.ai-content li {
+    margin-bottom: 0.3rem;
+}
+
+.ai-content blockquote {
+    border-left: 4px solid var(--theme-primary);
+    padding-left: 0.75rem;
+    margin: 0.75rem 0;
+    font-style: italic;
+    border-radius: 0 0.375rem 0.375rem 0;
+}
+html:not(.dark) .ai-content blockquote {
+    background: #f8fafc;
+    color: #475569;
+}
+html.dark .ai-content blockquote {
+    background: #1e293b;
+    color: #94a3b8;
+}
+
+.ai-content .code-block-wrapper {
+    position: relative;
+    margin: 0.75rem 0;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background-color: #0f172a;
+    border: 1px solid #1e293b;
+}
+
+.ai-content .code-block-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.35rem 0.75rem;
+    background-color: #1e293b;
+    font-size: 0.75rem;
+    color: #94a3b8;
+    font-family: ui-monospace, monospace;
+}
+
+.ai-content pre {
+    padding: 0.85rem 1rem;
+    margin: 0;
+    overflow-x: auto;
+    color: #e2e8f0;
+    font-size: 0.85rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    line-height: 1.5;
+}
+
+.ai-content pre code {
+    background: none;
+    padding: 0;
+    border: none;
+    color: inherit;
+}
+
+.ai-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.75rem 0;
+    font-size: 0.875rem;
+}
+
+.ai-content th,
+.ai-content td {
+    border: 1px solid #e2e8f0;
+    padding: 0.4rem 0.65rem;
+    text-align: left;
+}
+html.dark .ai-content th,
+html.dark .ai-content td {
+    border: 1px solid #334155;
+}
+
+.ai-content th {
+    font-weight: 600;
+}
+html:not(.dark) .ai-content th {
+    background-color: #f8fafc;
+}
+html.dark .ai-content th {
+    background-color: #1e293b;
+}
+
+/* Auto-resize smooth transition */
+#messageInput {
+    transition: height 0.1s ease-out;
+}
