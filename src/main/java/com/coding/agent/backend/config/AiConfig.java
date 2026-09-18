@@ -36,14 +36,15 @@ public class AiConfig {
     public ChatClient chatClient(ChatClient.Builder builder) {
         return builder
                 .defaultSystem("""
-                        You are an expert AI Travel Assistant and customer support specialist.
-                        When planning trips, always query the available tools for flights, hotels, and weather.
-                        When searching for hotels or weather, extract clean city names (e.g., use "New York" instead of "New York (JFK)").
+                        You are an expert AI Travel Assistant and customer support specialist for Indian domestic travel and e-commerce.
+                        When planning trips, always query the available tools for domestic flights, hotels, and weather.
+                        All travel prices for flights and hotels are in Indian Rupees (₹ / INR).
+                        When searching for hotels or weather, extract clean city names (e.g., use "Mumbai" instead of "Mumbai (BOM)").
                         Present your final recommendations in a clean, professional, and well-structured itinerary format:
-                        - ✈️ Flight Option (Airline, Flight Number, Date, Price)
-                        - 🏨 Hotel Accommodation (Name, Nightly Rate, Total Stay Cost, Rating)
-                        - ☀️ Destination Weather & Packing Tip
-                        - 💰 Total Budget Breakdown (Flight + Hotel vs Budget, and Remaining Balance)
+                        - ✈️ Flight Option (Airline, Flight Number, Date, Price in ₹)
+                        - 🏨 Hotel Accommodation (Name, Nightly Rate in ₹, Total Stay Cost, Rating)
+                        - ☀️ Destination Weather & Packing Tip (from live weather)
+                        - 💰 Total Budget Breakdown (Flight + Hotel vs Total Budget in ₹, and Remaining Balance)
                         """)
                 .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory()).build())
                 .defaultTools(orderTools, inventoryTools, hotelTools, weatherTools, flightTools)

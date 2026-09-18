@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Spring AI Agent · Classic Chat</title>
+    <title>AI Assistant · Classic Chat</title>
 
     <!-- Pre-script to prevent theme flickering on reload -->
     <script>
@@ -56,22 +56,22 @@
 <body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 antialiased h-screen flex flex-col justify-between overflow-hidden transition-colors duration-200">
 
     <!-- Main Chat Container -->
-    <div class="max-w-4xl w-full mx-auto h-full flex flex-col bg-white dark:bg-slate-900 shadow-xl sm:border-x sm:border-slate-200 dark:sm:border-slate-800 transition-colors duration-200">
+    <div class="max-w-4xl w-full mx-auto h-full flex flex-col bg-white dark:bg-slate-900 shadow-xl sm:border-x sm:border-slate-200/90 dark:sm:border-slate-800 transition-colors duration-200">
 
         <!-- Classic Header -->
-        <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 sm:px-5 py-3.5 flex items-center justify-between flex-shrink-0 z-20 transition-colors duration-200">
+        <header class="bg-white dark:bg-slate-900 border-b border-slate-200/90 dark:border-slate-800 px-4 sm:px-6 py-3 flex items-center justify-between flex-shrink-0 z-20 transition-colors duration-200 shadow-sm">
             <!-- Left Info -->
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full theme-bg flex items-center justify-center text-white shadow-sm ring-2 ring-slate-100 dark:ring-slate-800 transition-colors duration-200">
+                <div class="w-9 h-9 rounded-xl theme-bg flex items-center justify-center text-white shadow-sm transition-colors duration-200">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                 </div>
                 <div>
                     <div class="flex items-center gap-2">
-                        <h1 class="text-base font-semibold text-slate-900 dark:text-slate-100 leading-none">Spring AI Assistant</h1>
-                        <span id="statusBadge" class="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        <h1 class="text-base font-semibold tracking-tight text-slate-900 dark:text-slate-100 leading-none">AI Assistant</h1>
+                        <span id="statusBadge" class="inline-flex items-center gap-1.5 text-[11px] font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full border border-emerald-200/70 dark:border-emerald-800/60">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                             Online
                         </span>
                     </div>
@@ -166,60 +166,60 @@
         </header>
 
         <!-- Message Feed Area -->
-        <main id="chatMessages" class="flex-1 overflow-y-auto px-4 sm:px-6 py-6 scroll-smooth bg-slate-50/50 dark:bg-slate-900/40 transition-colors duration-200">
+        <main id="chatMessages" class="flex-1 overflow-y-auto px-4 sm:px-6 py-6 scroll-smooth bg-slate-50/60 dark:bg-slate-900/50 transition-colors duration-200">
 
             <!-- Welcome / Starter Card -->
-            <div id="welcomeCard" class="py-8 px-4 text-center max-w-lg mx-auto">
-                <div class="w-14 h-14 theme-light-bg theme-text rounded-2xl flex items-center justify-center mx-auto mb-4 border theme-border shadow-sm transition-colors duration-200">
-                    <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+            <div id="welcomeCard" class="py-10 px-4 text-center max-w-lg mx-auto">
+                <div class="w-12 h-12 theme-light-bg theme-text rounded-2xl flex items-center justify-center mx-auto mb-4 border theme-border shadow-sm transition-colors duration-200">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                 </div>
-                <h2 class="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-1.5">How can I assist you today?</h2>
-                <p class="text-sm text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
+                <h2 class="text-lg font-semibold tracking-tight text-slate-800 dark:text-slate-100 mb-1.5">How can I assist you today?</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
                     Ask me to plan a trip (flights, hotels, weather &amp; budget), or check inventory and customer orders.
                 </p>
 
                 <!-- Starter Prompt Chips -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-left">
                     <button type="button"
-                            onclick="sendSuggestion('Plan a trip from Paris (CDG) to New York (JFK) on 2026-10-21 for 2 nights with a $1,400 budget. Check flight, hotel under $300/night, and weather.')"
-                            class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/80 hover:border-[var(--theme-primary)] hover:shadow-md transition-all text-left group">
+                            onclick="sendSuggestion('Plan a trip from Mumbai to Goa on 2026-10-21 for 2 nights with a ₹15,000 budget. Check flight, hotel under ₹5,000/night, and live weather.')"
+                            class="p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-800/80 hover:border-[var(--theme-primary)] hover:shadow-sm transition-all text-left group">
                         <div class="flex items-center gap-2 mb-1">
-                            <span class="text-base">✈️</span>
-                            <span class="text-xs font-semibold text-slate-700 dark:text-slate-200 group-hover:text-[var(--theme-primary)] transition-colors">Trip to New York</span>
+                            <span class="text-base">🏖️</span>
+                            <span class="text-xs font-semibold text-slate-700 dark:text-slate-200 group-hover:text-[var(--theme-primary)] transition-colors">Mumbai to Goa Trip</span>
                         </div>
-                        <p class="text-[12px] text-slate-400 dark:text-slate-400">Flight + hotel + weather package under budget</p>
+                        <p class="text-[12px] text-slate-400 dark:text-slate-400 leading-snug">Flight + beach resort + weather in ₹</p>
                     </button>
 
                     <button type="button"
-                            onclick="sendSuggestion('Find flights from New York (JFK) to London (LHR) on 2026-10-15 and check the weather in London.')"
-                            class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/80 hover:border-[var(--theme-primary)] hover:shadow-md transition-all text-left group">
+                            onclick="sendSuggestion('Find flights from Delhi to Mumbai on 2026-10-20, search hotels under ₹8,000/night, and check Mumbai live weather.')"
+                            class="p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-800/80 hover:border-[var(--theme-primary)] hover:shadow-sm transition-all text-left group">
                         <div class="flex items-center gap-2 mb-1">
-                            <span class="text-base">🇬🇧</span>
-                            <span class="text-xs font-semibold text-slate-700 dark:text-slate-200 group-hover:text-[var(--theme-primary)] transition-colors">London Flight &amp; Weather</span>
+                            <span class="text-base">✈️</span>
+                            <span class="text-xs font-semibold text-slate-700 dark:text-slate-200 group-hover:text-[var(--theme-primary)] transition-colors">Delhi to Mumbai</span>
                         </div>
-                        <p class="text-[12px] text-slate-400 dark:text-slate-400">Compare flights and packing advice</p>
+                        <p class="text-[12px] text-slate-400 dark:text-slate-400 leading-snug">Compare domestic flights &amp; hotels</p>
                     </button>
 
                     <button type="button"
                             onclick="sendSuggestion('What products are currently in stock in inventory?')"
-                            class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/80 hover:border-[var(--theme-primary)] hover:shadow-md transition-all text-left group">
+                            class="p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-800/80 hover:border-[var(--theme-primary)] hover:shadow-sm transition-all text-left group">
                         <div class="flex items-center gap-2 mb-1">
                             <span class="text-base">📦</span>
                             <span class="text-xs font-semibold text-slate-700 dark:text-slate-200 group-hover:text-[var(--theme-primary)] transition-colors">In-Stock Products</span>
                         </div>
-                        <p class="text-[12px] text-slate-400 dark:text-slate-400">List all warehouse inventory items</p>
+                        <p class="text-[12px] text-slate-400 dark:text-slate-400 leading-snug">List all warehouse inventory items</p>
                     </button>
 
                     <button type="button"
                             onclick="sendSuggestion('What is the status of order 1042?')"
-                            class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/80 hover:border-[var(--theme-primary)] hover:shadow-md transition-all text-left group">
+                            class="p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-800/80 hover:border-[var(--theme-primary)] hover:shadow-sm transition-all text-left group">
                         <div class="flex items-center gap-2 mb-1">
                             <span class="text-base">🔍</span>
                             <span class="text-xs font-semibold text-slate-700 dark:text-slate-200 group-hover:text-[var(--theme-primary)] transition-colors">Track Order #1042</span>
                         </div>
-                        <p class="text-[12px] text-slate-400 dark:text-slate-400">Check customer delivery status</p>
+                        <p class="text-[12px] text-slate-400 dark:text-slate-400 leading-snug">Check customer delivery status</p>
                     </button>
                 </div>
             </div>
@@ -227,8 +227,8 @@
         </main>
 
         <!-- Classic Bottom Input Bar -->
-        <footer class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 sm:px-6 py-4 flex-shrink-0 transition-colors duration-200">
-            <div class="flex items-end gap-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-2xl px-4 py-2.5 theme-ring transition-all shadow-inner">
+        <footer class="border-t border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 sm:px-6 py-3.5 flex-shrink-0 transition-colors duration-200">
+            <div class="flex items-end gap-3 bg-slate-50/80 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 theme-ring transition-all shadow-sm">
                 <textarea
                     id="messageInput"
                     rows="1"
@@ -243,10 +243,10 @@
                     onclick="sendMessage()"
                     disabled
                     title="Send message"
-                    class="flex-shrink-0 w-9 h-9 rounded-xl theme-bg theme-bg-hover text-white flex items-center justify-center disabled:bg-slate-200 dark:disabled:bg-slate-700 disabled:text-slate-400 dark:disabled:text-slate-500 disabled:cursor-not-allowed transition-all shadow-sm active:scale-95"
+                    class="flex-shrink-0 w-8 h-8 rounded-lg theme-bg theme-bg-hover text-white flex items-center justify-center disabled:bg-slate-200 dark:disabled:bg-slate-700 disabled:text-slate-400 dark:disabled:text-slate-500 disabled:cursor-not-allowed transition-all shadow-sm active:scale-95 mb-0.5"
                 >
-                    <svg class="w-4 h-4 transform rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    <svg class="w-3.5 h-3.5 transform rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                     </svg>
                 </button>
             </div>

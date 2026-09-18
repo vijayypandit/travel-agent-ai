@@ -1,8 +1,5 @@
 package com.coding.agent.backend.controller;
 
-import com.coding.agent.backend.model.ChatRequest;
-import com.coding.agent.backend.service.ChatService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -13,6 +10,11 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.coding.agent.backend.model.ChatRequest;
+import com.coding.agent.backend.service.ChatService;
+
+import lombok.RequiredArgsConstructor;
 
 @CrossOrigin
 @RestController
@@ -43,6 +45,7 @@ public class ChatController {
         String conversationId = (request.conversationId() != null && !request.conversationId().isBlank())
                 ? request.conversationId().trim()
                 : headerConversationId;
+
         String response = chatService.chat(request.message().trim(), conversationId);
         return ResponseEntity.ok(response);
     }

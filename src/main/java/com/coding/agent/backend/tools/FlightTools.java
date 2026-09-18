@@ -1,54 +1,74 @@
 package com.coding.agent.backend.tools;
 
-import com.coding.agent.backend.model.Flight;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Component;
+
+import com.coding.agent.backend.model.Flight;
 
 @Component
 public class FlightTools {
 
     private static final Logger log = LoggerFactory.getLogger(FlightTools.class);
 
-    
-    //search flight
-    //dummy data
+    // Domestic Indian Flights
     private final List<Flight> flights = List.of(
-            new Flight("AI-202", "Air India", "New York (JFK)", "London (LHR)", "2026-10-15", 650),
-            new Flight("BA-178", "British Airways", "New York (JFK)", "London (LHR)", "2026-10-15", 720),
-            new Flight("EK-501", "Emirates", "Dubai (DXB)", "Mumbai (BOM)", "2026-10-16", 380),
-            new Flight("LH-400", "Lufthansa", "Frankfurt (FRA)", "New York (JFK)", "2026-10-17", 850),
-            new Flight("UA-837", "United Airlines", "San Francisco (SFO)", "Tokyo (NRT)", "2026-10-18", 950),
-            new Flight("QF-11", "Qantas", "Sydney (SYD)", "Los Angeles (LAX)", "2026-10-19", 1100),
-            new Flight("6E-205", "IndiGo", "Delhi (DEL)", "Bangalore (BLR)", "2026-10-20", 95),
-            new Flight("AF-007", "Air France", "Paris (CDG)", "New York (JFK)", "2026-10-21", 780));
+            new Flight("6E-205", "IndiGo", "Delhi (DEL)", "Mumbai (BOM)", "2026-10-20", 4500),
+            new Flight("AI-806", "Air India", "Delhi (DEL)", "Mumbai (BOM)", "2026-10-20", 5200),
+            new Flight("QP-1102", "Akasa Air", "Delhi (DEL)", "Mumbai (BOM)", "2026-10-20", 4100),
+            
+            new Flight("6E-451", "IndiGo", "Mumbai (BOM)", "Delhi (DEL)", "2026-10-22", 4700),
+            new Flight("AI-624", "Air India", "Mumbai (BOM)", "Delhi (DEL)", "2026-10-22", 5100),
 
-    // search flight tool method
-    @Tool(name = "searchFlight", description = "Search for available flights based on source, destination, and date.")
+            new Flight("6E-512", "IndiGo", "Delhi (DEL)", "Bangalore (BLR)", "2026-10-20", 5800),
+            new Flight("AI-504", "Air India", "Delhi (DEL)", "Bangalore (BLR)", "2026-10-20", 6200),
+
+            new Flight("6E-782", "IndiGo", "Mumbai (BOM)", "Goa (GOI)", "2026-10-21", 3200),
+            new Flight("AI-883", "Air India", "Mumbai (BOM)", "Goa (GOI)", "2026-10-21", 3800),
+
+            new Flight("6E-341", "IndiGo", "Bangalore (BLR)", "Goa (GOI)", "2026-10-21", 2800),
+            new Flight("AI-510", "Air India", "Bangalore (BLR)", "Delhi (DEL)", "2026-10-25", 5900),
+
+            new Flight("6E-901", "IndiGo", "Delhi (DEL)", "Jaipur (JAI)", "2026-10-22", 2200),
+            new Flight("AI-491", "Air India", "Delhi (DEL)", "Kolkata (CCU)", "2026-10-23", 4900),
+            new Flight("6E-618", "IndiGo", "Kolkata (CCU)", "Mumbai (BOM)", "2026-10-24", 5400)
+    );
+
+    private String cleanCity(String city) {
+        if (city == null) return "";
+        return city.replaceAll("\\(.*?\\)", "").trim().toLowerCase();
+    }
+
+    @Tool(name = "searchFlight", description = "Search for available domestic Indian flights based on source city, destination city, and date (YYYY-MM-DD). Prices are in INR (₹).")
     public String searchFlight(String source, String destination, String date) {
         log.info("Inside searchFlight Tool - source: {}, destination: {}, date: {}", source, destination, date);
 
+        String cleanSrc = cleanCity(source);
+        String cleanDest = cleanCity(destination);
+
         List<Flight> filteredFlights = flights.stream()
-                .filter(f -> f.getSource().equalsIgnoreCase(source)
-                          && f.getDestination().equalsIgnoreCase(destination)
-                          && f.getDate().equals(date))
+                .filter(f -> {
+                    String fSrc = cleanCity(f.getSource());
+                    String fDest = cleanCity(f.getDestination());
+                    boolean srcMatch = fSrc.contains(cleanSrc) || cleanSrc.contains(fSrc);
+                    boolean destMatch = fDest.contains(cleanDest) || cleanDest.contains(fDest);
+                    boolean dateMatch = (date == null || date.isBlank()) || f.getDate().equals(date.trim());
+                    return srcMatch && destMatch && dateMatch;
+                })
                 .toList();
 
         if (filteredFlights.isEmpty()) {
             log.info("No flights found for criteria: {} -> {} on {}", source, destination, date);
-            return "No flights found for the given criteria.";
+            return "No domestic flights found from " + source + " to " + destination + " on " + date + ".";
         }
 
         log.info("Found {} flight(s) matching criteria", filteredFlights.size());
         return filteredFlights.stream()
-                .map(f -> f.getAirline() + " (" + f.getFlightNumber() + ") : $" + f.getPrice())
+                .map(f -> f.getAirline() + " (" + f.getFlightNumber() + ") from " + f.getSource() + " to " + f.getDestination() + " on " + f.getDate() + " : ₹" + f.getPrice())
                 .collect(Collectors.joining(", "));
     }
-
-    //flight status
-    //flight booking
 }

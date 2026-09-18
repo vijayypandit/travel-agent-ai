@@ -14,17 +14,42 @@ public class HotelTools {
 
     private static final Logger log = LoggerFactory.getLogger(HotelTools.class);
 
-    // Sample hotel data
+    // Domestic Indian Hotel Inventory
     private final List<Hotel> hotels = List.of(
-        new Hotel("H101", "The Grand Palace", "New York", 250, 4.8, true),
-        new Hotel("H102", "Sunset Boulevard Resort", "New York", 180, 4.5, true),
-        new Hotel("H103", "Taj Palace", "New Delhi", 150, 4.9, true),
-        new Hotel("H104", "Eiffel Luxury Suites", "London", 320, 4.7, false),
-        new Hotel("H105", "Marina Bay Sands View", "London", 300, 4.9, true)
+        // Mumbai
+        new Hotel("H-MUM-1", "The Taj Mahal Palace", "Mumbai", 12000, 4.9, true),
+        new Hotel("H-MUM-2", "Trident Nariman Point", "Mumbai", 7500, 4.7, true),
+        new Hotel("H-MUM-3", "Bloomrooms @ Juhu", "Mumbai", 3800, 4.4, true),
+
+        // Delhi
+        new Hotel("H-DEL-1", "Taj Palace", "Delhi", 8500, 4.8, true),
+        new Hotel("H-DEL-2", "The Imperial New Delhi", "Delhi", 9500, 4.9, true),
+        new Hotel("H-DEL-3", "The Lalit New Delhi", "Delhi", 5200, 4.5, true),
+        new Hotel("H-DEL-4", "Ginger Hotel New Delhi", "Delhi", 2800, 4.2, true),
+
+        // Goa
+        new Hotel("H-GOA-1", "Taj Exotica Resort & Spa", "Goa", 11000, 4.9, true),
+        new Hotel("H-GOA-2", "W Goa (Vagator)", "Goa", 9000, 4.8, true),
+        new Hotel("H-GOA-3", "Seashell Suites and Villas", "Goa", 4500, 4.6, true),
+        new Hotel("H-GOA-4", "Goa Marriott Resort", "Goa", 7000, 4.7, true),
+
+        // Bangalore
+        new Hotel("H-BLR-1", "The Leela Palace Bengaluru", "Bangalore", 10500, 4.9, true),
+        new Hotel("H-BLR-2", "ITC Gardenia", "Bangalore", 7200, 4.7, true),
+        new Hotel("H-BLR-3", "Radisson Blu Atria", "Bangalore", 4200, 4.5, true),
+
+        // Jaipur
+        new Hotel("H-JAI-1", "Rambagh Palace", "Jaipur", 14000, 5.0, true),
+        new Hotel("H-JAI-2", "ITC Rajputana", "Jaipur", 5500, 4.7, true),
+        new Hotel("H-JAI-3", "Umaid Bhawan Heritage Hotel", "Jaipur", 3400, 4.4, true),
+
+        // Kolkata
+        new Hotel("H-CCU-1", "The Oberoi Grand", "Kolkata", 8000, 4.8, true),
+        new Hotel("H-CCU-2", "ITC Sonar", "Kolkata", 6000, 4.6, true)
     );
 
     // Search hotels tool
-    @Tool(name = "searchHotel", description = "Search for available hotels in a specific city within a maximum budget per night.")
+    @Tool(name = "searchHotel", description = "Search for available hotels in an Indian city (e.g., Mumbai, Delhi, Goa, Bangalore, Jaipur, Kolkata) within a maximum budget per night in INR (₹).")
     public String searchHotels(String city, int maxPrice) {
         log.info("Inside searchHotels tool for city: {}, maxPrice: {}", city, maxPrice);
         StringBuilder result = new StringBuilder();
@@ -40,14 +65,14 @@ public class HotelTools {
                 }
                 result.append(hotel.name())
                       .append(" (ID: ").append(hotel.id())
-                      .append(", Price: $").append(hotel.pricePerNight()).append("/night")
+                      .append(", Price: ₹").append(hotel.pricePerNight()).append("/night")
                       .append(", Rating: ").append(hotel.rating()).append("★)");
             }
         }
 
         if (result.isEmpty()) {
-            log.info("No hotels found in {} under budget ${}", city, maxPrice);
-            return "No available hotels found in " + city + " within the price of $" + maxPrice + " per night.";
+            log.info("No hotels found in {} under budget ₹{}", city, maxPrice);
+            return "No available hotels found in " + city + " within ₹" + maxPrice + " per night.";
         }
 
         log.info("Hotels found: {}", result);
@@ -62,7 +87,7 @@ public class HotelTools {
                 .filter(h -> h.id().equalsIgnoreCase(hotelId.trim()))
                 .findFirst()
                 .map(h -> h.available()
-                        ? "Booking confirmed for " + h.name() + " in " + h.city() + " at $" + h.pricePerNight() + "/night."
+                        ? "Booking confirmed for " + h.name() + " in " + h.city() + " at ₹" + h.pricePerNight() + "/night."
                         : h.name() + " is currently fully booked.")
                 .orElse("Hotel with ID " + hotelId + " not found.");
     }

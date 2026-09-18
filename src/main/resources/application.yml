@@ -1,10 +1,13 @@
 spring:
   application:
     name: ai-agent-backend
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: false
 
   ai:
     openai:
-      api-key: ""
+      api-key: "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"
       base-url: https://api.groq.com/openai/v1
       chat:
         model: openai/gpt-oss-120b
@@ -14,6 +17,10 @@ spring:
 
 server:
   port: 8082
+
+weatherstack:
+  access-key: 3588ddfccae2530c28d16c345180ad17
+  base-url: http://api.weatherstack.com
 
 # Actuator & Prometheus Exposure
 # management:
