@@ -311,10 +311,24 @@ function escapeHtml(str) {
 }
 
 /**
- * Simple Markdown renderer supporting code blocks, bold, lists, etc.
+ * Modern Markdown renderer supporting tables, code blocks, checklists, bold, etc.
  */
 function formatMarkdown(text) {
     if (!text) return '';
+
+    try {
+        if (typeof marked !== 'undefined') {
+            marked.setOptions({
+                gfm: true,
+                breaks: true
+            });
+            const rawHtml = marked.parse(text);
+            const cleanHtml = typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(rawHtml) : rawHtml;
+            return cleanHtml;
+        }
+    } catch (e) {
+        console.warn('Marked parse error, falling back to basic regex', e);
+    }
 
     let html = escapeHtml(text);
 
@@ -337,26 +351,13 @@ function formatMarkdown(text) {
         `;
     });
 
-    // Inline code
     html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-
-    // Bold text
     html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-
-    // Italic text
     html = html.replace(/\*([^\*]+)\*/g, '<em>$1</em>');
-
-    // Unordered lists (- or *)
     html = html.replace(/(?:^|\n)[-*] (.+)/g, '\n<li>$1</li>');
     html = html.replace(/(<li>.+<\/li>(\n<li>.+<\/li>)*)/g, '<ul>$1</ul>');
-
-    // Ordered lists (1. 2.)
     html = html.replace(/(?:^|\n)\d+\. (.+)/g, '\n<li>$1</li>');
-
-    // Paragraphs
     html = html.replace(/\n{2,}/g, '</p><p>');
-
-    // Single newlines
     html = html.replace(/\n/g, '<br>');
 
     return `<p>${html}</p>`;

@@ -329,32 +329,66 @@ html.dark .ai-content blockquote {
     color: inherit;
 }
 
+/* ── Modern Table Styling ── */
 .ai-content table {
     width: 100%;
-    border-collapse: collapse;
-    margin: 0.75rem 0;
-    font-size: 0.875rem;
-}
-
-.ai-content th,
-.ai-content td {
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 1rem 0;
+    font-size: 0.825rem;
+    border-radius: 0.75rem;
+    overflow: hidden;
     border: 1px solid #e2e8f0;
-    padding: 0.4rem 0.65rem;
-    text-align: left;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
 }
-html.dark .ai-content th,
-html.dark .ai-content td {
-    border: 1px solid #334155;
+html.dark .ai-content table {
+    border-color: #334155;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
 }
 
 .ai-content th {
     font-weight: 600;
-}
-html:not(.dark) .ai-content th {
+    letter-spacing: 0.02em;
+    padding: 0.65rem 0.85rem;
+    text-align: left;
     background-color: #f8fafc;
+    border-bottom: 2px solid #e2e8f0;
+    color: #475569;
 }
 html.dark .ai-content th {
     background-color: #1e293b;
+    border-bottom: 2px solid #334155;
+    color: #cbd5e1;
+}
+
+.ai-content td {
+    padding: 0.6rem 0.85rem;
+    text-align: left;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+html.dark .ai-content td {
+    border-bottom: 1px solid #1e293b;
+}
+
+.ai-content tr:last-child td {
+    border-bottom: none;
+}
+
+.ai-content tr:hover td {
+    background-color: rgba(0, 0, 0, 0.015);
+}
+html.dark .ai-content tr:hover td {
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+/* Modern Card Box inside AI content */
+.ai-content h3 {
+    margin-top: 1rem;
+    margin-bottom: 0.4rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--theme-primary);
 }
 
 /* Auto-resize smooth transition */

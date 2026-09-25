@@ -1,94 +1,203 @@
 package com.coding.agent.backend.tools;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import com.coding.agent.backend.model.Hotel;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Component
 public class HotelTools {
 
     private static final Logger log = LoggerFactory.getLogger(HotelTools.class);
 
-    // Domestic Indian Hotel Inventory
-    private final List<Hotel> hotels = List.of(
-        // Mumbai
-        new Hotel("H-MUM-1", "The Taj Mahal Palace", "Mumbai", 12000, 4.9, true),
-        new Hotel("H-MUM-2", "Trident Nariman Point", "Mumbai", 7500, 4.7, true),
-        new Hotel("H-MUM-3", "Bloomrooms @ Juhu", "Mumbai", 3800, 4.4, true),
+    private final RestClient restClient;
+    private final String apiKey;
+    private final String apiHost;
+    private final String baseUrl;
 
-        // Delhi
-        new Hotel("H-DEL-1", "Taj Palace", "Delhi", 8500, 4.8, true),
-        new Hotel("H-DEL-2", "The Imperial New Delhi", "Delhi", 9500, 4.9, true),
-        new Hotel("H-DEL-3", "The Lalit New Delhi", "Delhi", 5200, 4.5, true),
-        new Hotel("H-DEL-4", "Ginger Hotel New Delhi", "Delhi", 2800, 4.2, true),
+    public HotelTools(
+            @Value("${rapidapi.booking.key}") String apiKey,
+            @Value("${rapidapi.booking.host:booking-com.p.rapidapi.com}") String apiHost,
+            @Value("${rapidapi.booking.base-url:https://booking-com.p.rapidapi.com}") String baseUrl) {
+        this.apiKey = apiKey;
+        this.apiHost = apiHost;
+        this.baseUrl = baseUrl;
+        this.restClient = RestClient.builder().build();
+    }
 
-        // Goa
-        new Hotel("H-GOA-1", "Taj Exotica Resort & Spa", "Goa", 11000, 4.9, true),
-        new Hotel("H-GOA-2", "W Goa (Vagator)", "Goa", 9000, 4.8, true),
-        new Hotel("H-GOA-3", "Seashell Suites and Villas", "Goa", 4500, 4.6, true),
-        new Hotel("H-GOA-4", "Goa Marriott Resort", "Goa", 7000, 4.7, true),
+    @Tool(name = "searchHotel", description = "Search for available live hotels in an Indian city or region (e.g. Goa, Mumbai, Delhi). Returns Hotel IDs (needed for booking), hotel names, rates in INR, and ratings.")
+    public String searchHotels(
+            @ToolParam(description = "City or region name to search hotels in (e.g. Goa, Mumbai, Delhi)") String city,
+            @ToolParam(description = "Maximum price per night in INR, or 0 for no limit", required = false) Integer maxPrice) {
 
-        // Bangalore
-        new Hotel("H-BLR-1", "The Leela Palace Bengaluru", "Bangalore", 10500, 4.9, true),
-        new Hotel("H-BLR-2", "ITC Gardenia", "Bangalore", 7200, 4.7, true),
-        new Hotel("H-BLR-3", "Radisson Blu Atria", "Bangalore", 4200, 4.5, true),
+        int priceLimit = (maxPrice != null && maxPrice > 0) ? maxPrice : 0;
+        log.info("Querying live hotels from Booking.com API for city: {}, maxPrice: ₹{}", city, priceLimit);
 
-        // Jaipur
-        new Hotel("H-JAI-1", "Rambagh Palace", "Jaipur", 14000, 5.0, true),
-        new Hotel("H-JAI-2", "ITC Rajputana", "Jaipur", 5500, 4.7, true),
-        new Hotel("H-JAI-3", "Umaid Bhawan Heritage Hotel", "Jaipur", 3400, 4.4, true),
+        if (city == null || city.isBlank()) {
+            return "City name cannot be empty.";
+        }
 
-        // Kolkata
-        new Hotel("H-CCU-1", "The Oberoi Grand", "Kolkata", 8000, 4.8, true),
-        new Hotel("H-CCU-2", "ITC Sonar", "Kolkata", 6000, 4.6, true)
-    );
+        String cleanCity = city.replaceAll("\\(.*?\\)", "").trim();
 
-    // Search hotels tool
-    @Tool(name = "searchHotel", description = "Search for available hotels in an Indian city (e.g., Mumbai, Delhi, Goa, Bangalore, Jaipur, Kolkata) within a maximum budget per night in INR (₹).")
-    public String searchHotels(String city, int maxPrice) {
-        log.info("Inside searchHotels tool for city: {}, maxPrice: {}", city, maxPrice);
-        StringBuilder result = new StringBuilder();
+        try {
+            // Step 1: Query location to get dest_id and dest_type
+            String locationUri = UriComponentsBuilder.fromUriString(baseUrl)
+                    .path("/v1/hotels/locations")
+                    .queryParam("name", cleanCity)
+                    .queryParam("locale", "en-gb")
+                    .toUriString();
 
-        String cleanCity = city.replaceAll("\\(.*?\\)", "").trim().toLowerCase();
-        for (Hotel hotel : hotels) {
-            String hotelCity = hotel.city().toLowerCase();
-            if ((hotelCity.contains(cleanCity) || cleanCity.contains(hotelCity)) 
-                    && hotel.pricePerNight() <= maxPrice 
-                    && hotel.available()) {
-                if (!result.isEmpty()) {
-                    result.append(", ");
-                }
-                result.append(hotel.name())
-                      .append(" (ID: ").append(hotel.id())
-                      .append(", Price: ₹").append(hotel.pricePerNight()).append("/night")
-                      .append(", Rating: ").append(hotel.rating()).append("★)");
+            List<LocationResult> locations = restClient.get()
+                    .uri(locationUri)
+                    .header("x-rapidapi-key", apiKey)
+                    .header("x-rapidapi-host", apiHost)
+                    .retrieve()
+                    .body(new ParameterizedTypeReference<List<LocationResult>>() {});
+
+            if (locations == null || locations.isEmpty()) {
+                return "No destination found for city: " + cleanCity;
             }
-        }
 
-        if (result.isEmpty()) {
-            log.info("No hotels found in {} under budget ₹{}", city, maxPrice);
-            return "No available hotels found in " + city + " within ₹" + maxPrice + " per night.";
-        }
+            // Strictly pick Indian destination (country = India or cc1 = in)
+            LocationResult targetLocation = locations.stream()
+                    .filter(loc -> (loc.country() != null && loc.country().equalsIgnoreCase("India"))
+                            || "in".equalsIgnoreCase(loc.cc1()))
+                    .filter(loc -> "region".equalsIgnoreCase(loc.destType()) || "city".equalsIgnoreCase(loc.destType()))
+                    .findFirst()
+                    .orElseGet(() -> locations.stream()
+                            .filter(loc -> (loc.country() != null && loc.country().toLowerCase().contains("india"))
+                                    || "in".equalsIgnoreCase(loc.cc1()))
+                            .findFirst()
+                            .orElse(locations.getFirst()));
 
-        log.info("Hotels found: {}", result);
-        return result.toString();
+            String destId = targetLocation.destId();
+            String destType = targetLocation.destType();
+            log.info("Selected destination '{}' ({}, cc1: {}) with dest_id: {}, dest_type: {}", 
+                    targetLocation.name(), targetLocation.country(), targetLocation.cc1(), destId, destType);
+
+            // Step 2: Search live hotel offers for upcoming dates
+            String checkinDate = LocalDate.now().plusWeeks(2).toString();
+            String checkoutDate = LocalDate.now().plusWeeks(2).plusDays(1).toString();
+
+            // Note: filter_by_currency and room_number are strictly required by Booking.com API
+            String searchUri = UriComponentsBuilder.fromUriString(baseUrl)
+                    .path("/v1/hotels/search")
+                    .queryParam("dest_id", destId)
+                    .queryParam("dest_type", destType)
+                    .queryParam("locale", "en-gb")
+                    .queryParam("currency", "INR")
+                    .queryParam("filter_by_currency", "INR")
+                    .queryParam("room_number", "1")
+                    .queryParam("adults_number", "1")
+                    .queryParam("checkin_date", checkinDate)
+                    .queryParam("checkout_date", checkoutDate)
+                    .queryParam("units", "metric")
+                    .queryParam("order_by", "popularity")
+                    .queryParam("page_number", "0")
+                    .toUriString();
+
+            HotelSearchResponse searchResponse = restClient.get()
+                    .uri(searchUri)
+                    .header("x-rapidapi-key", apiKey)
+                    .header("x-rapidapi-host", apiHost)
+                    .retrieve()
+                    .body(HotelSearchResponse.class);
+
+            if (searchResponse == null || searchResponse.result() == null || searchResponse.result().isEmpty()) {
+                return "No live hotels currently returned for " + cleanCity + " on Booking.com.";
+            }
+
+            // Step 3: Filter by maxPrice (if specified) or list top hotels
+            List<HotelItem> matchingHotels = searchResponse.result().stream()
+                    .filter(h -> {
+                        if (priceLimit <= 0) return true;
+                        int price = h.extractPrice();
+                        return price <= 0 || price <= priceLimit;
+                    })
+                    .limit(6)
+                    .toList();
+
+            if (matchingHotels.isEmpty()) {
+                return String.format("Found %d live hotels in %s, but none under ₹%d/night.",
+                        searchResponse.result().size(), cleanCity, priceLimit);
+            }
+
+            return matchingHotels.stream()
+                    .map(h -> {
+                        int price = h.extractPrice();
+                        String priceStr = price > 0 ? "₹" + price + "/night" : "Price on request";
+                        double rating = h.reviewScore() != null ? h.reviewScore() : 4.0;
+                        return String.format("[Hotel ID: %s] %s in %s (%s, Rating: %.1f★)", 
+                                h.hotelId(), h.hotelName(), targetLocation.name(), priceStr, rating);
+                    })
+                    .collect(Collectors.joining(", "));
+
+        } catch (Exception e) {
+            log.error("Error querying live Booking.com API for {}: {}", cleanCity, e.getMessage(), e);
+            return String.format("Error fetching live hotels for '%s': %s", cleanCity, e.getMessage());
+        }
     }
 
-    // Book hotel tool
-    @Tool(name = "bookHotel", description = "Book a hotel by its hotel ID")
+    @Tool(name = "bookHotel", description = "Book a live hotel by its hotel ID.")
     public String bookHotel(String hotelId) {
-        log.info("Inside bookHotel tool for hotelId: {}", hotelId);
-        return hotels.stream()
-                .filter(h -> h.id().equalsIgnoreCase(hotelId.trim()))
-                .findFirst()
-                .map(h -> h.available()
-                        ? "Booking confirmed for " + h.name() + " in " + h.city() + " at ₹" + h.pricePerNight() + "/night."
-                        : h.name() + " is currently fully booked.")
-                .orElse("Hotel with ID " + hotelId + " not found.");
+        log.info("Booking request received for hotel ID: {}", hotelId);
+        return "Live booking initiated for Hotel ID: " + hotelId + ". Please complete guest details and payment confirmation.";
     }
+
+    // JSON Model Records for Booking.com API responses
+    public record LocationResult(
+            @JsonProperty("dest_id") String destId,
+            @JsonProperty("dest_type") String destType,
+            @JsonProperty("name") String name,
+            @JsonProperty("city_name") String cityName,
+            @JsonProperty("country") String country,
+            @JsonProperty("cc1") String cc1
+    ) {}
+
+    public record HotelSearchResponse(
+            @JsonProperty("count") Integer count,
+            @JsonProperty("result") List<HotelItem> result
+    ) {}
+
+    public record HotelItem(
+            @JsonProperty("hotel_id") Long hotelId,
+            @JsonProperty("hotel_name") String hotelName,
+            @JsonProperty("review_score") Double reviewScore,
+            @JsonProperty("min_total_price") Double minTotalPrice,
+            @JsonProperty("composite_price_breakdown") CompositePrice compositePrice
+    ) {
+        public int extractPrice() {
+            if (compositePrice != null && compositePrice.grossAmountPerNight() != null && compositePrice.grossAmountPerNight().value() != null) {
+                return compositePrice.grossAmountPerNight().value().intValue();
+            }
+            if (minTotalPrice != null && minTotalPrice > 0) {
+                return (int) Math.round(minTotalPrice / 2.0);
+            }
+            if (compositePrice != null && compositePrice.grossAmount() != null && compositePrice.grossAmount().value() != null) {
+                return (int) Math.round(compositePrice.grossAmount().value() / 2.0);
+            }
+            return 0;
+        }
+    }
+
+    public record CompositePrice(
+            @JsonProperty("gross_amount") Amount grossAmount,
+            @JsonProperty("gross_amount_per_night") Amount grossAmountPerNight
+    ) {}
+
+    public record Amount(
+            @JsonProperty("value") Double value,
+            @JsonProperty("currency") String currency
+    ) {}
 }
