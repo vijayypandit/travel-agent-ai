@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
 
+/**
+ * Domain entity model representing a domestic flight with schedule and pricing information.
+ */
 @Getter
 @Setter
 @AllArgsConstructor

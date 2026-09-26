@@ -10,6 +10,10 @@ import org.springframework.stereotype.Component;
 
 import com.coding.agent.backend.model.Flight;
 
+/**
+ * Tool component providing flight search capabilities across major Indian domestic airline routes.
+ * Registered as an AI tool for Spring AI ChatClient.
+ */
 @Component
 public class FlightTools {
 
@@ -38,11 +42,25 @@ public class FlightTools {
             new Flight("6E-618", "IndiGo", "Kolkata (CCU)", "Mumbai (BOM)", "2026-10-24", 5400)
     );
 
+    /**
+     * Normalizes city strings by stripping airport codes, punctuation, and converting to lowercase.
+     * 
+     * @param city raw city string
+     * @return sanitized lowercase city name
+     */
     private String cleanCity(String city) {
         if (city == null) return "";
         return city.replaceAll("\\(.*?\\)", "").trim().toLowerCase();
     }
 
+    /**
+     * Searches for available domestic flights between origin and destination on a specified date.
+     * 
+     * @param source departure city name or code
+     * @param destination arrival city name or code
+     * @param date travel date in YYYY-MM-DD format
+     * @return formatted flight options with fares in INR (₹)
+     */
     @Tool(name = "searchFlight", description = "Search for available domestic Indian flights based on source city, destination city, and date (YYYY-MM-DD). Prices are in INR (₹).")
     public String searchFlight(String source, String destination, String date) {
         log.info("Inside searchFlight Tool - source: {}, destination: {}, date: {}", source, destination, date);

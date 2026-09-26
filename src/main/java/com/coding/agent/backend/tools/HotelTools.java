@@ -16,6 +16,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * Tool component providing live hotel search and booking integration via Booking.com API.
+ * Registered as an AI tool for Spring AI ChatClient.
+ */
 @Component
 public class HotelTools {
 
@@ -26,6 +30,13 @@ public class HotelTools {
     private final String apiHost;
     private final String baseUrl;
 
+    /**
+     * Initializes HotelTools with RapidAPI Booking.com credentials and endpoint configuration.
+     * 
+     * @param apiKey RapidAPI key
+     * @param apiHost RapidAPI host header
+     * @param baseUrl base URL for Booking.com API endpoints
+     */
     public HotelTools(
             @Value("${rapidapi.booking.key}") String apiKey,
             @Value("${rapidapi.booking.host:booking-com.p.rapidapi.com}") String apiHost,
@@ -36,6 +47,13 @@ public class HotelTools {
         this.restClient = RestClient.builder().build();
     }
 
+    /**
+     * Queries live hotels from Booking.com API for a destination city within an optional maximum price limit.
+     * 
+     * @param city destination city or region name
+     * @param maxPrice optional upper budget per night in INR (₹)
+     * @return summary list of hotels with IDs, prices, ratings, and locations
+     */
     @Tool(name = "searchHotel", description = "Search for available live hotels in an Indian city or region (e.g. Goa, Mumbai, Delhi). Returns Hotel IDs (needed for booking), hotel names, rates in INR, and ratings.")
     public String searchHotels(
             @ToolParam(description = "City or region name to search hotels in (e.g. Goa, Mumbai, Delhi)") String city,
@@ -138,8 +156,14 @@ public class HotelTools {
                         int price = h.extractPrice();
                         String priceStr = price > 0 ? "₹" + price + "/night" : "Price on request";
                         double rating = h.reviewScore() != null ? h.reviewScore() : 4.0;
-                        return String.format("[Hotel ID: %s] %s in %s (%s, Rating: %.1f★)", 
-                                h.hotelId(), h.hotelName(), targetLocation.name(), priceStr, rating);
+                        String locInfo = "";
+                        if (h.distance() != null && !h.distance().isBlank()) {
+                            locInfo = String.format(", Transit: %s from centre", h.distance());
+                        } else if (h.district() != null && !h.district().isBlank()) {
+                            locInfo = String.format(", Area: %s", h.district());
+                        }
+                        return String.format("[Hotel ID: %s] %s in %s (%s, Rating: %.1f★%s)", 
+                                h.hotelId(), h.hotelName(), targetLocation.name(), priceStr, rating, locInfo);
                     })
                     .collect(Collectors.joining(", "));
 
@@ -149,13 +173,21 @@ public class HotelTools {
         }
     }
 
+    /**
+     * Initiates a live hotel booking process for a specified hotel ID.
+     * 
+     * @param hotelId unique identifier of the hotel
+     * @return confirmation message for booking initiation
+     */
     @Tool(name = "bookHotel", description = "Book a live hotel by its hotel ID.")
     public String bookHotel(String hotelId) {
         log.info("Booking request received for hotel ID: {}", hotelId);
         return "Live booking initiated for Hotel ID: " + hotelId + ". Please complete guest details and payment confirmation.";
     }
 
-    // JSON Model Records for Booking.com API responses
+    /**
+     * DTO mapping Booking.com location autocomplete results.
+     */
     public record LocationResult(
             @JsonProperty("dest_id") String destId,
             @JsonProperty("dest_type") String destType,
@@ -165,18 +197,32 @@ public class HotelTools {
             @JsonProperty("cc1") String cc1
     ) {}
 
+    /**
+     * DTO mapping Booking.com hotel search response wrapper.
+     */
     public record HotelSearchResponse(
             @JsonProperty("count") Integer count,
             @JsonProperty("result") List<HotelItem> result
     ) {}
 
+    /**
+     * DTO mapping individual hotel listings from Booking.com.
+     */
     public record HotelItem(
             @JsonProperty("hotel_id") Long hotelId,
             @JsonProperty("hotel_name") String hotelName,
             @JsonProperty("review_score") Double reviewScore,
             @JsonProperty("min_total_price") Double minTotalPrice,
-            @JsonProperty("composite_price_breakdown") CompositePrice compositePrice
+            @JsonProperty("composite_price_breakdown") CompositePrice compositePrice,
+            @JsonProperty("distance") String distance,
+            @JsonProperty("address") String address,
+            @JsonProperty("district") String district
     ) {
+        /**
+         * Resolves the approximate nightly rate from gross amounts or total prices.
+         * 
+         * @return nightly rate in local currency units
+         */
         public int extractPrice() {
             if (compositePrice != null && compositePrice.grossAmountPerNight() != null && compositePrice.grossAmountPerNight().value() != null) {
                 return compositePrice.grossAmountPerNight().value().intValue();
@@ -191,11 +237,17 @@ public class HotelTools {
         }
     }
 
+    /**
+     * Composite price breakdown containing total and per-night amount details.
+     */
     public record CompositePrice(
             @JsonProperty("gross_amount") Amount grossAmount,
             @JsonProperty("gross_amount_per_night") Amount grossAmountPerNight
     ) {}
 
+    /**
+     * Monetary amount structure with numerical value and currency symbol.
+     */
     public record Amount(
             @JsonProperty("value") Double value,
             @JsonProperty("currency") String currency

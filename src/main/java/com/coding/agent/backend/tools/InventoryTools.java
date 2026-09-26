@@ -8,6 +8,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Component;
 
+/**
+ * Tool component providing inventory stock status and catalog queries for e-commerce items.
+ * Registered as an AI tool for Spring AI ChatClient.
+ */
 @Component
 public class InventoryTools {
 
@@ -24,6 +28,12 @@ public class InventoryTools {
             "Noise-cancellation Headphones", 10
     );
 
+    /**
+     * Checks current stock quantity and availability for a specific product name.
+     * 
+     * @param productName name of the product to query
+     * @return availability message with available quantity
+     */
     @Tool(description = "Check the availability of a product by its name")
     public String checkStock(String productName) {
         log.info("Calling checkStock Tool for product: {}", productName);
@@ -38,12 +48,22 @@ public class InventoryTools {
         }
     }
 
+    /**
+     * Calculates the aggregate sum of all inventory units in stock.
+     * 
+     * @return total count of units available in warehouse
+     */
     @Tool(description = "Get the total count of the products in the stock")
     public Integer getTotalProductsInStock() {
         log.info("Calling getTotalProductsInStock Tool");
         return stock.values().stream().mapToInt(Integer::intValue).sum();
     }
 
+    /**
+     * Retrieves the names of all products currently having at least 1 unit in stock.
+     * 
+     * @return list of in-stock product names
+     */
     @Tool(description = "Get the list of all products in stock")
     public List<String> getAllProductsInStocks() {
         log.info("Calling getAllProductsInStocks Tool");
